@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEND Strategies Toolkit</title>
+<style>
+  :root{
+    --ink:#1f2933;
+    --muted:#5a6472;
+    --line:#dfe3e8;
+    --bg:#f4f5f7;
+    --card:#ffffff;
+    --accent:#3a6ea5;
+    --accent-dark:#2a527c;
+    --good:#3a8c5e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  header.top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    margin-bottom:24px;
+    gap:16px;
+  }
+  header.top h1{
+    font-size:1.4rem;
+    margin:0 0 4px;
+  }
+  header.top p{
+    margin:0;
+    color:var(--muted);
+    font-size:0.92rem;
+  }
+  .reset-link{
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--muted);
+    font-size:0.85rem;
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .reset-link:hover{ border-color:var(--accent); color:var(--accent); }
+
+  .steps{
+    display:flex;
+    gap:8px;
+    margin-bottom:28px;
+  }
+  .step-pill{
+    flex:1;
+    text-align:center;
+    padding:9px 6px;
+    border-radius:7px;
+    background:var(--card);
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-size:0.85rem;
+    font-weight:600;
+  }
+  .step-pill.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .step-pill.done{
+    border-color:var(--good);
+    color:var(--good);
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:24px;
+    margin-bottom:18px;
+  }
+  .card h2{
+    margin-top:0;
+    font-size:1.15rem;
+  }
+  .card .hint{
+    color:var(--muted);
+    font-size:0.9rem;
+    margin-top:-6px;
+    margin-bottom:18px;
+  }
+
+  .condition-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    gap:12px;
+  }
+  .condition-tile{
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    padding:14px 16px;
+    cursor:pointer;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    transition:border-color .15s, background .15s;
+    border-left-width:5px;
+  }
+  .condition-tile:hover{ border-color:var(--accent); }
+  .condition-tile.selected{ background:#eef4fb; border-color:var(--accent); }
+  .condition-tile input{ margin-top:3px; width:17px; height:17px; flex-shrink:0; }
+  .condition-tile .label{
+    font-weight:600;
+    font-size:0.97rem;
+  }
+  .condition-tile .count{
+    color:var(--muted);
+    font-size:0.82rem;
+    margin-top:2px;
+  }
+
+  .condition-section{ margin-bottom:26px; }
+  .condition-heading{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+    padding-bottom:6px;
+    border-bottom:2px solid var(--line);
+  }
+  .condition-tag{
+    display:inline-block;
+    font-size:0.72rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:4px 9px;
+    border-radius:5px;
+    color:#fff;
+  }
+  .condition-heading h3{
+    margin:0;
+    font-size:1.05rem;
+    font-weight:600;
+    color:var(--muted);
+  }
+  .section-tools{
+    margin-left:auto;
+    display:flex;
+    gap:10px;
+  }
+  .section-tools button{
+    background:none;
+    border:none;
+    color:var(--accent);
+    font-size:0.82rem;
+    cursor:pointer;
+    padding:0;
+    text-decoration:underline;
+  }
+
+  .strategy-row{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:11px 4px;
+    border-bottom:1px solid #eef0f2;
+  }
+  .strategy-row:last-child{ border-bottom:none; }
+  .strategy-row input{ margin-top:4px; width:17px; height:17px; flex-shrink:0; cursor:pointer; }
+  .strategy-row label{ cursor:pointer; font-size:0.95rem; }
+
+  .reflect-block{ margin-bottom:22px; }
+  .reflect-block .strategy-text{
+    font-size:0.95rem;
+    margin:6px 0 10px;
+    padding:12px 14px;
+    background:#f9fafb;
+    border-left:4px solid var(--accent);
+    border-radius:0 6px 6px 0;
+  }
+  textarea{
+    width:100%;
+    min-height:90px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-family:inherit;
+    font-size:0.93rem;
+    resize:vertical;
+  }
+  textarea:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:22px;
+    gap:12px;
+  }
+  .nav-row .right-group{ display:flex; gap:10px; }
+  button.btn{
+    font-size:0.95rem;
+    font-weight:600;
+    padding:10px 20px;
+    border-radius:7px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+  }
+  button.btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  button.btn.primary:hover{ background:var(--accent-dark); }
+  button.btn:disabled{
+    opacity:0.45;
+    cursor:not-allowed;
+  }
+  button.btn.secondary{ background:var(--card); }
+  button.btn.ghost{
+    background:none;
+    border:none;
+    color:var(--muted);
+    text-decoration:underline;
+  }
+
+  .empty-msg{
+    color:var(--muted);
+    font-size:0.95rem;
+    padding:20px 0;
+    text-align:center;
+  }
+  .saved-note{
+    color:var(--good);
+    font-size:0.82rem;
+    margin-left:8px;
+  }
+  @media (max-width:600px){
+    .nav-row{ flex-direction:column-reverse; align-items:stretch; }
+    .nav-row .right-group{ justify-content:flex-end; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ---------- Data extracted from "SEND Strategies" (Beating Bureaucracy in Special Educational Needs, Jean Gross, Routledge, 2023) ---------- */
+const CONDITIONS = {
+  adhd: {
+    label: "Attention Deficit Hyperactivity Disorder (ADHD)",
+    color: "#c0533e",
+    strategies: [
+      `Take child to unfamiliar classroom before lesson so that they can familiarise themselves with it and discuss where they should sit.`,
+      `Discuss seating pupil near front with their back to the class, between two good role models and well away from areas other pupils need to walk through.`,
+      `Establish a quiet place where pupil can go to work.`,
+      `Keep one wall plain if you have lots of displays so the pupil can sit facing that to avoid overstimulation.`,
+      `Provide a ‘settling in’ task the pupil can get on with on entering the classroom, such as a word search.`,
+      `Allow pupil to fiddle with a piece of Blu-Tack, rubber band, squeeze ball or another chosen object.`,
+      `Have them use a mini-whiteboard to record their ideas, to stop them shouting out.`,
+      `Make tasks short, with frequent breaks and opportunities to move around and use up energy – putting post-its up on the wall, cleaning the whiteboard or tables, etc.`,
+      `Give instructions simply and clearly. Make sure the pupil is looking at you first. Check that he or she has understood them.`,
+      `Aim for a ratio of four positive comments to one negative, and teach pupil how to reward themselves: ‘You managed to concentrate on your work very well just then; give yourself a pat on the back.’`,
+      `Devise a private signal system to let the pupil know when they are off-task or behaving inappropriately.`,
+      `Use a planned reward system.`,
+      `Teach/use clear classroom routines, for example, have all pupils hold an object when it is their turn to talk. Display classroom rules and routines for pupil to refer to. Illustrate them visually – for example, use a traffic-light system to indicate whether pupils can talk or not, or symbols for different noise levels (partner voices, group voices, classroom voice, playground voices).`,
+      `When pupil is misbehaving: say what you want him or her to do, rather than what you don’t – ‘N, I want you to keep your hands in your lap’ instead of ‘N, stop bothering P’; label the behaviour but not the pupil – not ‘You big bully’ but ‘N, bullying is not allowed in our school’; remind pupil of a rule, rather than telling them off – ‘N, our rule is we put up our hand to answer’, or make a point of praising a pupil who is keeping the rule – ‘A, I like the way you put your hand up when you knew the answer’; use the language of choice, reminding pupils of the consequences of the various behavioural choices open to them.`,
+      `Give frequent time warnings so pupils know when they will be expected to have finished a task.`,
+      `Use a kitchen or sand timer to help pupil complete a task in a specified period of time.`,
+      `To help pupil work independently: actively teach core routines for certain tasks, having pupil practise them with progressively less help until they can quickly tell you and show you what they have to do if you ask them to do that type of task; give independent tasks that have previously been modelled for the whole class; give clear guidelines – ‘I expect you to have produced at least three lines by ten past ten; I will be asking you to share these with your writing partner.’; use task cards/checklists for them to tick off as they complete each element of a task; provide support in the form of writing frames, word mats, relevant classroom displays, and prompts such as a card with ideas for ‘Five things to do if you are stuck with your work’.`,
+      `Ask another pupil or a small group to buddy the pupil who is having difficulties, praising them when they achieve easily reachable behavioural targets.`
+    ]
+  },
+  autism: {
+    label: "Autism",
+    color: "#6a4c93",
+    strategies: [
+      `Take child to unfamiliar classroom before lesson so that they can familiarise themselves with it and discuss lighting, position of teacher, where they should sit, for example, near the door or away from busy displays and distractions.`,
+      `Keep one wall plain if you have lots of displays so the pupil can sit facing that to avoid sensory overload.`,
+      `Allow pupil to use ear defenders and a ‘noisemeter’ on the wall to show classmates when noise levels get too high.`,
+      `Set up an individual workstation with propped box files as screeners.`,
+      `Prepare the pupil before the session/lesson by outlining what it will be about.`,
+      `Provide a ‘settling in’ task the pupil can get on with on entering the classroom, such as a word search.`,
+      `Support oral presentations/explanations with charts, diagrams, pictures, real objects or mime.`,
+      `Set tasks with clear goals, and write worksheets in step-by-step form.`,
+      `If pupil becomes anxious, allow him/her to remove self to an agreed calm-down area.`,
+      `If pupil becomes upset, try asking him to take a pile of books or other ‘heavy load’ to another room.`,
+      `Teach a relaxation strategy like slow breathing, and cue pupil when they need to use it.`,
+      `Teach/use clear classroom routines, for example, have all pupils hold an object when it is their turn to talk. Display classroom rules and routines, illustrated by pictures, for pupil to refer to. Illustrate them visually – for example, use a traffic-light system to indicate whether pupils can talk or not, or symbols for different noise levels (partner voices, group voices, classroom voice, playground voices).`,
+      `Use a visual way of showing the pupil what they/the class will be doing, such as a sequenced series of pictures (a visual timetable), clockface divided into sections or written list.`,
+      `Use timeline of events – arrows that branch to show where pupil will have to make choices.`,
+      `Where visual timetables with cards are used, choose autistic children to be the ones to put up the cards on the timetable.`,
+      `Where visual timetables are used, include an ‘oops’ card to add any unexpected changes to the regular routine.`,
+      `Put the next day’s visual timetable up before children leave at the end of the day.`,
+      `Use pictures or symbols to show pupils what they will be doing ‘Now’ and ‘Next’. Use ‘if’ and ‘then’ pictures/symbols to show what the pupil will be able to do if they first complete a certain task.`,
+      `Use pictures to flag up a change in activity in advance, such as a round table to show pupils are going to move into groups.`,
+      `If the pupil has sensory issues, provide gloves or other means of handling tactile materials (tongs, etc.).`,
+      `Use short, simple instructions. Give one at a time and check for understanding. Repeat instructions in same words rather than different ones. Write instructions down or ask a TA to record them on a mini-whiteboard the pupil can slip under their work as a checklist for the pupil to follow and tick off when completed.`,
+      `Use pupil’s name before asking a question or giving an instruction.`,
+      `Avoid or explain metaphorical language and idiom like ‘pull your socks up’, ‘it’s raining cats and dogs’, ‘in a minute’.`,
+      `Explain any changes of routine to the pupil in advance.`,
+      `Give time warnings: for example, ‘in five minutes it will be time to . . .’`,
+      `Involve the pupil by asking direct, concrete questions at their level of understanding.`,
+      `Support writing with writing frames, templates (e.g. writing up a science experiment), mind maps, gapped handouts.`,
+      `Allow pupil to work alone rather than in a group where possible. If in a group, give clear roles within the group, and put the rules and roles into writing.`,
+      `Use visual prompts on cards or photos, or consistent non-verbal signs (sit, look, listen, hand up, wait) to show pupil the social behaviours expected.`,
+      `Prevent repetitive questioning by giving pupil a set number of question cards to give you each time they ask a question – when cards are gone, no more questions.`,
+      `Don’t ask the pupil to talk or write about imagined experiences.`,
+      `Teach a single method for the pupil to follow rather than expect them to choose from multiple methods, for example, when completing calculations.`,
+      `Avoid tasks which depend on empathy (e.g. in literature, history, geography, PSHE and citizenship).`,
+      `Set explicit and clear expectations, for example, how many lines to write, how many questions to answer, how long to listen (use timer).`,
+      `Put a green ‘start’ dot on the pupil’s book and a line to show where to finish. Use in and out boxes for work to be done and work that is finished.`,
+      `Provide pupil with a symbol card to display when he or she wants help.`,
+      `Expect to teach pupil social skills, for example, what to say/do when praised, how to ask for help. Always tell the pupil what to do rather than what not to do.`,
+      `Provide a structure for unstructured time, for example, chess club rather than break time outside.`,
+      `Model to the pupil that making mistakes is OK and a part of the learning process.`,
+      `Use incentives based on pupil’s interests, for example, a pause every hour to focus on their interest or obsession, once they have completed their work.`,
+      `If pupil goes off at a tangent, direct conversation back to the topic in hand: ‘Right now we are talking about volcanoes.’`,
+      `Use immediate and individualised reward systems, for example, collecting a number of stickers.`
+    ]
+  },
+  semh: {
+    label: "Social, Emotional and Mental Health Needs",
+    color: "#1f8a70",
+    strategies: [
+      `Consult pupil about where they should sit, for example, by the door if anxious, or next to a more settled peer.`,
+      `If pupil becomes upset/anxious, allow him/her to remove self to an agreed calm-down area.`,
+      `Model talking about how you are feeling, reflect back how you think the pupil might be feeling, help pupil connect their actions to the underlying feelings. Reiterate that all feelings are OK – it’s what we do with them (behaviour) that might not be.`,
+      `Support pupil to use planned strategies to regulate their emotions, for example, personal calm-down box, deep breathing.`,
+      `Make tasks short, with frequent breaks and opportunities to move around.`,
+      `Remember that children (and adults) who are stressed find it hard to take in and remember complex information; make instructions short and clear. When pupil is experiencing emotional turbulence or anxiety, provide low-key tasks and increased structure and predictability in the classroom environment.`,
+      `Set tasks with clear goals, outputs and timescales.`,
+      `Make explicit the relevance of any task to the pupil’s goals.`,
+      `Teach/use clear classroom routines, for example, have all pupils hold an object when it is their turn to talk. Display classroom rules and routines for pupil to refer to. Illustrate them visually – for example, use a traffic-light system to indicate whether pupils can talk or not, or symbols for different noise levels (partner voices, group voices, classroom voice, playground voices).`,
+      `Expect to teach pupil specific behavioural skills, for example, how to ask for help.`,
+      `When pupil is misbehaving: say what you want him or her to do, rather than what you don’t – ‘N, I want you to keep your hands in your lap’ instead of ‘N, stop bothering P’; label the behaviour but not the pupil – not ‘You big bully’ but ‘N, bullying is not allowed in our school’; remind pupil of a rule, rather than telling them off – ‘N, our rule is we put up our hand to answer’, or make a point of praising a pupil who is keeping the rule – ‘A, I like the way you put your hand up when you knew the answer’; use the language of choice, reminding pupils of the consequences of the various behavioural choices open to them.`,
+      `Reframe their actions and attribute positive reasons for their behaviour: ‘I can see you’re not joining in the group discussion, but that’s probably because you need some extra thinking time.’`,
+      `Make an effort to ‘catch the pupil being good’ and praise them. Aim for a ratio of four positive comments to one negative, and teach pupil how to reward themselves: ‘You managed to concentrate on your work very well just then; give yourself a pat on the back.’`,
+      `Use proximal praise – praise a nearby pupil who is behaving appropriately.`,
+      `Devise a private signal system to let the pupil know when they are off-task or behaving inappropriately.`,
+      `Use a planned reward system for appropriate behaviour.`,
+      `Identify at least one success each day/lesson.`,
+      `Enhance access to technology – use of the internet to research a topic, access to predictive word processing and onscreen word grids to support writing, opportunities to create presentations.`,
+      `To help pupil work independently: actively teach core routines for certain tasks, having pupil practise them with progressively less help until they can quickly tell you and show you what they have to do if you ask them to do that type of task; set independent tasks that have previously been modelled for the whole class; give clear guidelines – ‘I expect you to have produced at least three lines by ten past ten; I will be asking you to share these with your writing partner.’; use visual prompts in the form of pictorial task cards; provide support in the form of writing frames, word mats, relevant classroom displays, and prompts such as a card with ideas for ‘Five things to do if you are stuck with your work’.`,
+      `Take steps to build pupil’s self-confidence: find out what they know about or are good at, and have them share this with the rest of the class or school; give them responsibilities, for example, organising a lunchtime or after-school club, being a playground buddy, helping those who are new to the school; have them keep records of new things they learn and can do; ask them to tutor another pupil with their work; photocopy or photograph good pieces of work for them to take home.`,
+      `Take special steps to build the relationship with the pupil: take extra care to greet the pupil each day, and say a word or two individually to them; have lunch with the pupil from time to time, try to involve them in a lunchtime or after-school club that you run; invite them to help you with daily tasks; listen without giving advice or opinions, show that you understand how the pupil feels – ‘That must have made you very angry/sad.’; when things go wrong, reject the behaviour, not the pupil – ‘This is not the behaviour I expect to see from someone as kind and helpful as you.’; don’t be afraid to tell the pupil you like them and that what happens to them matters to you – ‘You really matter to me, and it’s important to me that you do well this year.’`,
+      `Organise time – perhaps during registration – for a teaching assistant to chat with the pupil, giving them a chance to talk about anything that may be troubling them and get themselves ready for learning.`,
+      `Ask another pupil or a small group to buddy the pupil who is having difficulties, praising them when they achieve easily reachable behavioural targets.`,
+      `Deploy a teaching assistant to model, coach and reinforce group work skills when the pupil is working collaboratively with other pupils.`
+    ]
+  },
+  dyspraxia: {
+    label: "Dyspraxia, Motor Coordination and Associated Difficulties",
+    color: "#2f6690",
+    strategies: [
+      `Minimise need for extensive handwritten recording – use technology (predictive word processor, onscreen word banks, graphics packages), bullet points, mind mapping, flow charts, gapped handouts, buddy acting as scribe, pre-prepared post-its with information the pupil can pick up and place on the page, print off of IWB page for pupil to annotate.`,
+      `Avoid asking pupil to copy from board – quickly jot things down for them, provide a slip with date/title/learning objective that they can stick in their book or use a photocopy transcript of another pupil’s notes.`,
+      `Allow pupil to choose writing tools that are most comfortable for them – pencil, pen, felt pen.`,
+      `Design worksheets so that the layout is uncluttered. Use buff or cream paper, large print (12–14 point) and a clear font such as Arial. Set information out in panels. Signpost sections with key words, symbols and pictures. Put important information in bold or colour.`,
+      `Check seating – desktop should be at elbow height, pupil should be able to sit right back in their chair with knees bending back at right angles and feet flat on the floor. Put box or large book under feet if necessary.`,
+      `Use aids supplied – portable writing slope, clipboards to attach paper to, non-slip mats, repositional glue sticks used to anchor paper or other materials, ruler and paper backed with Dycem, small tray for equipment, triangular and thick-barrelled pencils/pens/paintbrushes or smooth-flowing rollerball pens, two handled/loop handled/spring-loaded scissors, handled ruler, transparent pencil case, templates and stencils (e.g. map outlines) for drawing.`,
+      `Use a reminder handwriting alphabet and numeral formation guide at top of desk.`,
+      `Use larger lined book or paper, columns or boxes to place numbers in, squared paper. Attach paper to desk with Blu-Tack.`,
+      `Provide the pupil with study packs – everything they need for each subject/lesson in a separate folder, plus pack of highlighter pens, post-it notes, a line tracker for following text, various-sized card ‘windows’ to limit vision to one area of page, sticky labels to use to correct or conceal.`,
+      `Teach pupil strategies to improve organisation, such as diaries, workplans, checklists of equipment they have to bring to school each day, use of organiser functions on laptop or mobile phone.`,
+      `Help pupil follow text on board or IWB by writing/highlighting alternate lines in different colours.`,
+      `Enlarge pages from textbooks, cut out the particular exercise needed and then mount it on a separate page.`,
+      `If the pupil needs to work through a series of questions, help them keep their place by using a paper clip or blob of Blu-Tack to indicate which question they are on.`,
+      `Pair pupil with a more coordinated study buddy for practical work.`,
+      `Provide additional time for practical tasks, changing for PE, putting on coat, etc.`,
+      `Provide pre-prepared formats (diagrams, charts and graphs) on which pupil can record information.`,
+      `Teach pupil to talk themselves through visual and spatial tasks – for example, learn verbal model for letter formation (‘b – start at top, down, up, round’), translate maths calculations into verbal problems.`,
+      `Seat pupil away from distractions with plenty of space on each side of them – writing arm on the outside edge of shared table. Pupil should be able to see the teacher without turning their body.`,
+      `Avoid criticism if pupil looks untidy.`,
+      `Choose resources that don’t require manipulation (for example, number line rather than counters in maths).`,
+      `Colour-code spatially confusing items, for example, minus sign in one colour, plus sign in another.`,
+      `Allow ample rest periods as concentration and motor effort is demanding and pupil is easily fatigued.`,
+      `Write down homework for pupil, post it on the school’s app or give it on a sheet or pre-printed sticky label they can put in their book. Accept homework written down by parents.`
+    ]
+  },
+  dyslexia: {
+    label: "Dyslexia",
+    color: "#b08300",
+    strategies: [
+      `Have pupils work in pairs – dyslexic pupil who has good ideas but difficulty with spelling and handwriting with a pupil who is good at writing but not so strong on ideas.`,
+      `Design worksheets so that the layout is uncluttered. Use buff or cream paper, large print (12–14 point) and a clear font such as Arial. Set information out in panels. Signpost sections with key words, symbols and pictures. Put important information in bold or colour.`,
+      `Have any text that the pupil will struggle with read to them by a ‘study buddy’ or TA or appropriate assistive technology.`,
+      `Avoid asking pupil to copy from board – quickly jot things down for them, provide a slip with date/title/learning objective that they can stick in their book or use a photocopy transcript of another pupil’s notes.`,
+      `Be aware that the pupil may find it hard to hold questions, information or instructions in their head for long enough to act on them: repeat instructions/questions; ‘chunk’ them rather than saying in one long string; jot them down on a sticky note, or encourage the pupil to do so; allow time for processing (for example, paired discussion with a partner before putting hands up).`,
+      `Be aware that dyslexic pupils may know something one day and forget it the next, may lose or forget equipment they need or may forget what they are supposed to be doing in the course of a lesson. Avoid criticism when this happens; instead, talk with them about strategies they can use to help them remember things.`,
+      `Use technology supports – laptop, predictive word processing, grids of useful words, sound files attached to information/instructions, sound files of key texts/revision notes, portable electronic phonetic dictionaries, Siri/Alexa support for spellings, speech-supported text, text-to-speech applications, spellcheckers, mind mapping software, reading pens, digital audio recorders/phones.`,
+      `Mark for content rather than presentation. When marking, praise for two correct spellings, target two incorrect spellings and use these errors as teaching points. Suggest a way of avoiding the mistake in the future – for example, the similarity of the spelling to other known words, or ‘the tricky bit’ that has to be learned.`,
+      `Give pupil a checklist to help them edit their work.`,
+      `Enable pupils to record their ideas using alternatives to writing: PowerPoint presentations, making videos or posters, oral presentations, dramatic reconstructions, mind maps, matching labels to pictures/diagrams/maps, sorting statements or pictures into categories.`,
+      `Scaffold writing: provide writing frames and templates (e.g. writing up a science experiment) to help structure thinking; provide prompt sheets – questions to answer, key words to build each section or paragraph around, sentences or paragraphs to put in correct order, paragraph openings; provide clue cards; use cloze procedure (where the pupil fills in missing words in text); print off an IWB page used in whole-class session and have pupils add to it/annotate.`,
+      `Do not expect pupils to easily remember sequences such as days of the week, months of the year, the alphabet, times tables, number facts. Provide aids (for example, a pocket alphabet or number line, table squares, calculator).`,
+      `Avoid embarrassing pupils by asking them to read aloud in front of others, unless they volunteer.`,
+      `Overcome problems in learning by rote by helping pupils recognise patterns, use mnemonics or use memory strategies that create relationships between items in a list in order to aid recall.`,
+      `Allow extra time to complete tasks, and be aware of the fatigue the pupil may experience because of the amount of effort they have to put in to learning.`,
+      `Teach pupil strategies to improve organisation, such as diaries, workplans, checklists of equipment they have to bring to school each day, use of organiser functions on mobile phone/laptop.`,
+      `Provide the pupil with a study pack – spellchecker, highlighter pens, glue sticks, post-it notes, a line tracker for following text, audio recorder, reading pen, index cards for subject vocabulary or spelling mnemonics, sheet of high-frequency words, alphabet strip, memory jogger card for b/d confusion, sticky labels to use to correct or conceal, a tables square, a calendar, a calculator.`,
+      `Write down homework for pupils, or give it on a pre-printed sticky label or sheet they can stick into their book, post it on the school app, or record your instructions on a mobile phone or tablet. Model the homework in class time. Allocate a homework buddy they can ring if they have forgotten what to do (‘phone a friend’).`
+    ]
+  },
+  hearing: {
+    label: "Hearing Impairment",
+    color: "#a13d63",
+    strategies: [
+      `Use TA for pre-tutoring – preparing pupil for lesson, for example, explaining new words and concepts.`,
+      `Take child to unfamiliar classroom before lesson so that they can discuss lighting, position of teacher, where they sit.`,
+      `Seat pupil at front where able to read text, hear and lip-read.`,
+      `Position sign supporters alongside teacher where pupil can see both.`,
+      `Ensure light is on teacher’s face, that is, light source behind pupil – don’t stand with your back to a window.`,
+      `Face pupil when speaking to facilitate lip-reading; repeat any instructions that have been given when the pupil could not see the speaker; avoid writing on board or IWB while speaking as you will not be facing pupil.`,
+      `Don’t make the pupil concentrate on lip-reading for too long without a break.`,
+      `When other pupils contribute, ensure that they speak one at a time. Paraphrase their contributions back to the class.`,
+      `Speak clearly, naturally and at a normal rate – shouting or exaggerated ‘mouthing’ distorts normal lip patterns.`,
+      `Minimise background noise, for example, noisy heater, buzzing light. Make other pupils aware of need for a quiet working environment.`,
+      `Use short simple instructions. Give one at a time and check for understanding. Repeat instructions first in same words, but then if the pupil does not understand a word, use a different one.`,
+      `Support oral presentations/explanations with charts, diagrams, pictures, real objects or mime.`,
+      `Write topics or headings on the board as you introduce them.`,
+      `Prepare the pupil before the session/lesson by outlining what it will be about.`,
+      `Use pupil’s name before asking a question or giving an instruction.`,
+      `Cue pupil in to a change of topic of conversation/presentation – say ‘now we are going to talk about . . .’`,
+      `Question pupil after some other pupils have given examples of what is required.`,
+      `Accept pupil’s spoken utterances, but rephrase and give them back in a grammatically correct version.`,
+      `Be aware that independent writing will reflect the pupil’s spoken language levels and will not necessarily be grammatically correct.`,
+      `Support writing with writing frames and lists of vocabulary to choose from.`,
+      `Put up a list of key vocabulary for a particular topic or lesson, and teach the meaning of each word.`,
+      `Use a range of ways of recording so that learning is not limited by the pupil’s ability to write full English sentences: bullet points and mind maps; ordering tasks – for example, ordering cut-out words to make a sentence, or sentences to make a sequence of instructions; matching tasks, such as matching labels to pictures/diagrams/maps; cloze procedure, where they fill in missing words in text; annotating a printout of IWB page; PowerPoint presentations; making posters, oral presentations, videos, dramatic reconstructions.`,
+      `Agree private signal that pupil can use to show you when they have not understood.`,
+      `Try to use video with subtitles; if not available, ensure pupil can access video material after lesson to go through it again. Don’t ask pupil to make notes while watching a video.`,
+      `Allow extra time to complete tasks, and be aware of the fatigue the pupil may experience because of the amount of effort they have to put in to listening.`
+    ]
+  },
+  learning: {
+    label: "Learning Difficulties",
+    color: "#4f5d2f",
+    strategies: [
+      `Use TA for pre-tutoring – preparing pupil for a task so that they come to it already knowing the key vocabulary and concepts.`,
+      `Link new learning to what pupil already knows – for example, start lesson with class mind map of what they already know about a subject.`,
+      `Tell pupils the three key points of the lesson, teach them and recap on them at the end.`,
+      `Break new learning down into small steps.`,
+      `Provide multiple examples of new concepts, and take these examples from children’s own real-life experience rather than talking in the abstract.`,
+      `Use visual and kinaesthetic learning – learning from pictures, diagrams, mind maps, using practical equipment, handling objects, moving and doing rather than sitting.`,
+      `Use scaffolding – having a peer or adult work alongside the pupil at first, then gradually withdraw as confidence grows, or having pupil finish a task that has already been part-done for them.`,
+      `Use short, simple instructions. Give one at a time and check for understanding. Write down and leave up instructions after saying them.`,
+      `Question pupil after some other pupils have given examples of what is required.`,
+      `Give pupil time to think or talk to a partner before answering a question, or say ‘I’m going to come back to you in a minute to ask you xxxx’.`,
+      `If pupil can’t answer a question, scaffold/support till they can rather than saying, ‘Can anyone help x?’; echo back the pupil’s answers in expanded form.`,
+      `Buddy the pupil with a more able peer.`,
+      `Have any text that the pupil will struggle with read to them by a ‘study buddy’ or TA or appropriate assistive technology.`,
+      `Put up a list of key vocabulary for a particular topic or lesson and teach the meaning of each word.`,
+      `To help pupil extract the salient points from information that are given, use highlighter pens, or provide cards telling them what they have to look out for on a visit, in a text or from sources such as film.`,
+      `Make learning strategies explicit by ‘thinking aloud’ yourself.`,
+      `Help pupil develop and generalise effective learning strategies – when successful, ask them to identify what they did to solve the problem/find the information.`,
+      `Model to the pupil that making mistakes is OK and a part of the learning process.`,
+      `Agree a private signal that the pupil can use to show you when they have not understood.`,
+      `Pair higher-attaining with lower-attaining pupils, and provide a range of collaborative activities so that they can help one another.`,
+      `Prepare pupils for writing – have them work in a group with you or a TA to rehearse orally what they want to say, then plan the writing together.`,
+      `Enable pupil to record their ideas using alternatives to writing: PowerPoint presentations, making posters, oral presentations, videos, dramatic reconstructions, mind maps, matching labels to pictures/diagrams/maps, sorting statements or pictures into categories.`,
+      `Use software that supports writing, with onscreen word grids from which they can choose the words they need.`,
+      `Scaffold writing: provide writing frames and templates (e.g. writing up a science experiment) to help structure thinking; supply prompt sheets – questions to answer, key words to build each section or paragraph around, sentences or paragraphs to put in correct order, paragraph openings; provide clue cards; use cloze procedure (where the pupil fills in missing words in text); print off an IWB page used in whole-class session and have pupils add to it/annotate.`,
+      `Give homework instructions on a sheet and make time to explain them. Record them on mobile phone or tablet and post on the school’s app. Model the homework in class time. Allocate a homework buddy to ring if they need help (‘phone a friend’).`
+    ]
+  },
+  slcn: {
+    label: "Speech, Language and Communication Needs",
+    color: "#0f6e84",
+    strategies: [
+      `Use TA for pre-tutoring – preparing pupil for a task so that they come to it already knowing the key vocabulary and concepts.`,
+      `Begin work on a new topic with pupils’ existing knowledge and experiences – make a mind map or other visual representation of what they already know.`,
+      `When you start a new topic, develop a class chart of the vocabulary that pupils will find useful or need to learn. Teach each word by helping children build a web of associations – what it sounds like, what it means, how it fits in a sentence.`,
+      `Use cued listening – give pupil a small number of questions that they will have to answer after listening to teacher explanation or video input.`,
+      `Use pupil’s name before asking a question or giving an instruction.`,
+      `Give directions before an activity, not during it.`,
+      `Keep verbal instructions simple and in the order you want them carried out. Be aware of how many ‘information-carrying’ words you are using: ‘Get your maths book from the pile on my desk, on a clean page, write the date and then copy down the calculations on the board’ has more information-carrying words than many adults will be able to remember.`,
+      `Check for understanding – ask the pupil to tell you what they have to do.`,
+      `Agree a private signal pupil can use to show you when they have not understood: ‘Sorry, I didn’t understand that – can you say it again, please?’ Praise them for asking for clarification.`,
+      `Support your oral presentations/explanations with pictures, real objects or mime. Use visuals (real objects, photographs, symbols) appropriate to pupil’s developmental level rather than chronological age. Use visual timetables.`,
+      `Display classroom rules and routines, illustrated by pictures, for pupil to refer to. Illustrate them visually – for example, use a traffic-light system to indicate whether pupils can talk or not, or symbols for different noise levels (partner voices, group voices, classroom voice, playground voices).`,
+      `Use symbols to support spoken language and text (www.widgit.com).`,
+      `Use visual summaries of discussions – mind maps, flow charts, diagrams, comic strip format, graphic organisers.`,
+      `Cue pupil in to a change of topic of conversation/presentation: say ‘Now we are going to talk about . . .’.`,
+      `When you ask a question, give pupil time (at least ten seconds) to respond and then, if necessary, repeat what you said. Use the same words unless you think the vocabulary was too difficult to understand.`,
+      `Question pupil after some other pupils have given examples of what is required.`,
+      `Give pupil time to talk to a partner before answering a question, or say ‘I’m going to come back to you in a minute to ask you xxxx. But first I’m going to ask y a question’.`,
+      `If pupil can’t answer a question, scaffold/support till they can rather than saying, ‘Can anyone help x?’`,
+      `Use a hierarchy of questions – start with an open question (‘What do you think might happen?’), then if support is needed, frame the question as alternatives (‘Do you think it’s x or y?’).`,
+      `Use question prompt card to help pupils know how to respond, for example, ‘Where?’ question requires a place.`,
+      `Pair pupil with a study buddy to repeat instructions and demonstrate tasks.`,
+      `Accept pupil’s spoken utterances, but rephrase and give them back in a grammatically correct and expanded version.`,
+      `Support oral work with talk frames/key phrases (‘First . . . next . . . finally’, ‘I think . . . but on the other hand’).`,
+      `Provide topic-related role-play/drama opportunities and model the language to be used.`,
+      `Talk about what you are doing using statements which give children examples of the language they might use.`,
+      `Support writing with writing frames and lists of vocabulary to choose from.`,
+      `Use a range of ways of recording so that learning is not limited by the pupil’s ability to write full English sentences: bullet points and mind maps; ordering tasks – for example, ordering cut-out words to make a sentence, or sentences to make a sequence of instructions; matching tasks, such as matching labels to pictures/diagrams/maps; cloze procedure, where they fill in missing words in text; annotating a printout of IWB page; PowerPoint presentations; making posters, oral presentations, videos, dramatic reconstructions.`,
+      `Provide the pupil with a study pack – glossaries of key subject vocabulary, highlighter pens, glue stick, post-it notes, index cards for subject vocabulary or spelling, mind maps/cartoon strips/key word lists, templates for writing up science experiments, etc.`,
+      `Allow extra time to complete tasks, and be aware of the fatigue the pupil may experience because of the amount of effort they have to put in to learning.`,
+      `Write down homework for pupil, put it on the school’s app, give it on a pre-printed sticky label or sheet they can stick into their book, or record your instructions on a mobile phone or tablet. Model the homework in class time. Allocate a homework buddy they can ring if they have forgotten what to do (‘phone a friend’).`
+    ]
+  },
+  visual: {
+    label: "Visual Impairment",
+    color: "#8a5a2b",
+    strategies: [
+      `Use TA for pre-tutoring – preparing pupil for lesson, for example, explaining concepts that rely on vision for understanding.`,
+      `Don’t ask pupil if they can see what is on board/IWB, etc. (they may not know) – check by using symbols that pupil knows, then use same-size font/background/colour as the symbols you have checked.`,
+      `Take child to unfamiliar classroom before lesson so that they can discuss lighting, where they sit.`,
+      `Avoid pupil having to look directly into a light source – do not sit or stand with the light behind you.`,
+      `Use clear, well-spaced print that is suitably contrasted with the background according to individual pupil’s needs (for x, y colour on z background). Use non-glossy, non-reflective paper. Use photocopies of masters, not of faint blurred versions.`,
+      `Give verbal information to replace/supplement information from pictures, questions, facial expressions.`,
+      `Use tactile experience to replace/supplement visual input (for example, if class is watching sugar cubes dissolve in a beaker, pupil can put their hand in beaker and feel it dissolve).`,
+      `Ensure pupil has an individual copy of print material being read, in the appropriate format (e.g. large print, Braille). This applies to information on classroom walls too (posters, key vocabulary lists).`,
+      `Say pupil’s name before asking a question or giving an instruction, and indicate who is talking in a class discussion.`,
+      `Provide pupil with own copy of materials to be written on board or IWB; read aloud what you or other pupils are writing up.`,
+      `Use larger-lined paper, columns or boxes to place numbers in, squared paper. Have pupil use dark pen instead of pencil.`,
+      `When alerting pupils to an action, artefact, illustration or example, don’t just point – describe what you want the pupils to take notice of, and if necessary describe what it is.`,
+      `Ensure pupil uses aids supplied – such as CCTV, hand held and portable video magnifiers, book stands, speech output software, digital accessible information system.`,
+      `Ensure pupil has access to the most appropriate medium for recording work (heavily lined paper, laptop, Braille machine, tape recorder, headphones, digital accessible information system). Access to power supply or space for Braille machine may be required.`,
+      `Ensure pupil has all the curriculum materials and equipment required to hand and that the materials are organised and contained consistently and securely (use Dycem non-slip mat, a high-sided tray or container with compartments).`,
+      `Raise position of text (e.g. using sloping desk, reading stands).`,
+      `Minimise need for extensive handwritten recording – use technology (predictive word processor, onscreen word banks, speech to print applications, graphics packages), bullet points, mind mapping, flow charts, gapped handouts, buddy acting as scribe, photocopied transcripts of notes, printout of IWB page for pupil to annotate.`,
+      `Use tactile indicators – Blu-Tack, paper clips – to help pupil find information, locate where they need to be on page, keep track of which question they are on in a series.`,
+      `Allow extra time to complete tasks, and be aware of the fatigue the pupil may experience because of the amount of effort they have to put into learning.`,
+      `Record your homework instructions on a mobile phone or tablet. Allocate a homework buddy they can ring if they have forgotten what to do (‘phone a friend’).`
+    ]
+  }
+};
+
+const STORAGE_KEY = "send_strategies_toolkit_v1";
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* localStorage unavailable - fall back to in-memory */ }
+  return null;
+}
+function blankState(){
+  return { step: 1, selectedConditions: [], selectedStrategies: {}, reflections: {} };
+}
+let state = loadState() || blankState();
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ /* ignore */ }
+}
+
+function strategyKey(condKey, idx){ return condKey + "::" + idx; }
+
+function el(tag, attrs, children){
+  const node = document.createElement(tag);
+  if(attrs) for(const k in attrs){
+    if(k === "class") node.className = attrs[k];
+    else if(k === "html") node.innerHTML = attrs[k];
+    else node.setAttribute(k, attrs[k]);
+  }
+  (children||[]).forEach(c=>{ if(c) node.appendChild(c); });
+  return node;
+}
+function text(tag, attrs, str){
+  const node = el(tag, attrs);
+  node.textContent = str;
+  return node;
+}
+
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  const header = el("header", {class:"top"}, [
+    el("div", {}, [
+      text("h1", {}, "SEND Strategies Toolkit"),
+      text("p", {}, "Choose conditions, pick strategies to try, then reflect on how they went.")
+    ]),
+    (function(){
+      const b = text("button", {class:"reset-link", type:"button"}, "Start over");
+      b.onclick = () => {
+        if(confirm("This clears all selections and reflections. Continue?")){
+          state = blankState();
+          saveState();
+          render();
+        }
+      };
+      return b;
+    })()
+  ]);
+  app.appendChild(header);
+
+  const steps = el("div", {class:"steps"}, [1,2,3].map(n=>{
+    const labels = {1:"1. Conditions", 2:"2. Strategies", 3:"3. Reflect"};
+    const cls = n === state.step ? "step-pill active" : (n < state.step ? "step-pill done" : "step-pill");
+    return text("div", {class:cls}, labels[n]);
+  }));
+  app.appendChild(steps);
+
+  if(state.step === 1) renderStep1(app);
+  else if(state.step === 2) renderStep2(app);
+  else renderStep3(app);
+}
+
+function renderStep1(app){
+  const card = el("div", {class:"card"});
+  card.appendChild(text("h2", {}, "Which areas of need are you supporting right now?"));
+  card.appendChild(text("p", {class:"hint"}, "Select one or more. You'll see all the strategies for your chosen areas on the next page."));
+
+  const grid = el("div", {class:"condition-grid"});
+  Object.keys(CONDITIONS).forEach(key=>{
+    const cond = CONDITIONS[key];
+    const checked = state.selectedConditions.includes(key);
+    const tile = el("label", {class: "condition-tile" + (checked ? " selected" : "")});
+    tile.style.borderLeftColor = cond.color;
+    const cb = el("input", {type:"checkbox"});
+    cb.checked = checked;
+    cb.onchange = () => {
+      const i = state.selectedConditions.indexOf(key);
+      if(cb.checked && i === -1) state.selectedConditions.push(key);
+      if(!cb.checked && i !== -1) state.selectedConditions.splice(i,1);
+      saveState();
+      render();
+    };
+    const textWrap = el("div", {}, [
+      text("div", {class:"label"}, cond.label),
+      text("div", {class:"count"}, cond.strategies.length + " strategies")
+    ]);
+    tile.appendChild(cb);
+    tile.appendChild(textWrap);
+    grid.appendChild(tile);
+  });
+  card.appendChild(grid);
+  app.appendChild(card);
+
+  const nav = el("div", {class:"nav-row"});
+  nav.appendChild(el("span", {}));
+  const rightGroup = el("div", {class:"right-group"});
+  const nextBtn = text("button", {class:"btn primary", type:"button"}, "Next: Choose strategies");
+  nextBtn.disabled = state.selectedConditions.length === 0;
+  nextBtn.onclick = () => {
+    if(state.selectedConditions.length === 0) return;
+    state.step = 2;
+    saveState();
+    render();
+  };
+  rightGroup.appendChild(nextBtn);
+  nav.appendChild(rightGroup);
+  app.appendChild(nav);
+}
+
+function renderStep2(app){
+  if(state.selectedConditions.length === 0){
+    const card = el("div", {class:"card"});
+    card.appendChild(text("p", {class:"empty-msg"}, "No conditions selected yet. Go back to step 1."));
+    app.appendChild(card);
+  }
+
+  state.selectedConditions.forEach(condKey=>{
+    const cond = CONDITIONS[condKey];
+    const card = el("div", {class:"card condition-section"});
+    const heading = el("div", {class:"condition-heading"});
+    const tag = text("span", {class:"condition-tag"}, cond.label);
+    tag.style.background = cond.color;
+    heading.appendChild(tag);
+
+    const tools = el("div", {class:"section-tools"});
+    const selectAllBtn = text("button", {type:"button"}, "Select all");
+    selectAllBtn.onclick = () => {
+      cond.strategies.forEach((s,idx)=>{ state.selectedStrategies[strategyKey(condKey, idx)] = true; });
+      saveState(); render();
+    };
+    const clearBtn = text("button", {type:"button"}, "Clear");
+    clearBtn.onclick = () => {
+      cond.strategies.forEach((s,idx)=>{ delete state.selectedStrategies[strategyKey(condKey, idx)]; });
+      saveState(); render();
+    };
+    tools.appendChild(selectAllBtn);
+    tools.appendChild(clearBtn);
+    heading.appendChild(tools);
+    card.appendChild(heading);
+
+    cond.strategies.forEach((strategyText, idx)=>{
+      const key = strategyKey(condKey, idx);
+      const row = el("div", {class:"strategy-row"});
+      const cb = el("input", {type:"checkbox", id:"cb_"+key});
+      cb.checked = !!state.selectedStrategies[key];
+      cb.onchange = () => {
+        if(cb.checked) state.selectedStrategies[key] = true;
+        else delete state.selectedStrategies[key];
+        saveState();
+        updateNextButtonStep2();
+      };
+      const label = el("label", {for:"cb_"+key});
+      label.textContent = strategyText;
+      row.appendChild(cb);
+      row.appendChild(label);
+      card.appendChild(row);
+    });
+    app.appendChild(card);
+  });
+
+  const nav = el("div", {class:"nav-row"});
+  const backBtn = text("button", {class:"btn secondary", type:"button"}, "Back");
+  backBtn.onclick = () => { state.step = 1; saveState(); render(); };
+  nav.appendChild(backBtn);
+
+  const rightGroup = el("div", {class:"right-group", id:"step2-right"});
+  const nextBtn = text("button", {class:"btn primary", type:"button", id:"step2-next"}, "Next: Reflect");
+  nextBtn.disabled = countSelectedStrategies() === 0;
+  nextBtn.onclick = () => {
+    if(countSelectedStrategies() === 0) return;
+    state.step = 3;
+    saveState();
+    render();
+  };
+  rightGroup.appendChild(nextBtn);
+  nav.appendChild(rightGroup);
+  app.appendChild(nav);
+}
+
+function countSelectedStrategies(){
+  return Object.keys(state.selectedStrategies).filter(k=>state.selectedStrategies[k]).length;
+}
+function updateNextButtonStep2(){
+  const btn = document.getElementById("step2-next");
+  if(btn) btn.disabled = countSelectedStrategies() === 0;
+}
+
+function renderStep3(app){
+  const selectedKeys = Object.keys(state.selectedStrategies).filter(k=>state.selectedStrategies[k]);
+
+  if(selectedKeys.length === 0){
+    const card = el("div", {class:"card"});
+    card.appendChild(text("p", {class:"empty-msg"}, "No strategies selected. Go back to step 2 and check at least one."));
+    app.appendChild(card);
+  } else {
+    const card = el("div", {class:"card"});
+    card.appendChild(text("h2", {}, "Reflect on each strategy"));
+    card.appendChild(text("p", {class:"hint"}, "Add your thoughts on how each strategy went with your students. Your notes are saved automatically on this device."));
+
+    state.selectedConditions.forEach(condKey=>{
+      const cond = CONDITIONS[condKey];
+      cond.strategies.forEach((strategyText, idx)=>{
+        const key = strategyKey(condKey, idx);
+        if(!state.selectedStrategies[key]) return;
+
+        const block = el("div", {class:"reflect-block"});
+        const tagRow = el("div", {});
+        const tag = text("span", {class:"condition-tag"}, cond.label);
+        tag.style.background = cond.color;
+        tagRow.appendChild(tag);
+        block.appendChild(tagRow);
+
+        const stratP = text("div", {class:"strategy-text"}, strategyText);
+        block.appendChild(stratP);
+
+        const ta = el("textarea", {placeholder:"What did you try, and how did it go for your students?"});
+        ta.value = state.reflections[key] || "";
+        ta.oninput = () => {
+          state.reflections[key] = ta.value;
+          saveState();
+        };
+        block.appendChild(ta);
+
+        card.appendChild(block);
+      });
+    });
+    app.appendChild(card);
+  }
+
+  const nav = el("div", {class:"nav-row"});
+  const backBtn = text("button", {class:"btn secondary", type:"button"}, "Back");
+  backBtn.onclick = () => { state.step = 2; saveState(); render(); };
+  nav.appendChild(backBtn);
+
+  const rightGroup = el("div", {class:"right-group"});
+  if(selectedKeys.length > 0){
+    const downloadBtn = text("button", {class:"btn", type:"button"}, "Download reflections");
+    downloadBtn.onclick = downloadReflections;
+    rightGroup.appendChild(downloadBtn);
+  }
+  nav.appendChild(rightGroup);
+  app.appendChild(nav);
+}
+
+function downloadReflections(){
+  let out = "SEND Strategies Toolkit - Reflections\n";
+  out += "Generated: " + new Date().toLocaleString() + "\n";
+  out += "========================================\n\n";
+
+  state.selectedConditions.forEach(condKey=>{
+    const cond = CONDITIONS[condKey];
+    const keysForCond = cond.strategies
+      .map((s,idx)=>({s, idx}))
+      .filter(({idx})=> state.selectedStrategies[strategyKey(condKey, idx)]);
+    if(keysForCond.length === 0) return;
+
+    out += cond.label.toUpperCase() + "\n" + "-".repeat(cond.label.length) + "\n\n";
+    keysForCond.forEach(({s, idx})=>{
+      const key = strategyKey(condKey, idx);
+      out += "Strategy: " + s + "\n";
+      out += "Reflection: " + (state.reflections[key] && state.reflections[key].trim() ? state.reflections[key].trim() : "(no reflection entered)") + "\n\n";
+    });
+  });
+
+  const blob = new Blob([out], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "send-strategies-reflections.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+render();
+</script>
+</body>
+</html>
