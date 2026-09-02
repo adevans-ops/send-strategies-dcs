@@ -208,7 +208,7 @@
     margin-top:22px;
     gap:12px;
   }
-  .nav-row .right-group{ display:flex; gap:10px; }
+  .nav-row .right-group{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
   button.btn{
     font-size:0.95rem;
     font-weight:600;
@@ -252,10 +252,27 @@
     .nav-row{ flex-direction:column-reverse; align-items:stretch; }
     .nav-row .right-group{ justify-content:flex-end; }
   }
+
+  #print-area{ display:none; }
+  @media print{
+    .wrap{ display:none !important; }
+    #print-area{
+      display:block;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:#000;
+      padding:20px;
+    }
+    #print-area h1{ font-size:1.3rem; margin-bottom:4px; }
+    #print-area .print-meta{ color:#444; font-size:0.85rem; margin-top:0; margin-bottom:20px; }
+    #print-area h2{ font-size:1.05rem; margin:22px 0 8px; page-break-after:avoid; }
+    #print-area ul{ margin:0 0 4px; padding-left:20px; }
+    #print-area li{ margin-bottom:10px; page-break-inside:avoid; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
+<div id="print-area"></div>
 
 <script>
 /* ---------- Data extracted from "SEND Strategies" (Beating Bureaucracy in Special Educational Needs, Jean Gross, Routledge, 2023) ---------- */
@@ -716,8 +733,20 @@ function renderStep2(app){
   nav.appendChild(backBtn);
 
   const rightGroup = el("div", {class:"right-group", id:"step2-right"});
+  const noneSelected = countSelectedStrategies() === 0;
+
+  const downloadBtn = text("button", {class:"btn secondary", type:"button", id:"step2-download"}, "Download strategies (.txt)");
+  downloadBtn.disabled = noneSelected;
+  downloadBtn.onclick = downloadSelectedStrategies;
+  rightGroup.appendChild(downloadBtn);
+
+  const printBtn = text("button", {class:"btn secondary", type:"button", id:"step2-print"}, "Print / Save as PDF");
+  printBtn.disabled = noneSelected;
+  printBtn.onclick = printSelectedStrategies;
+  rightGroup.appendChild(printBtn);
+
   const nextBtn = text("button", {class:"btn primary", type:"button", id:"step2-next"}, "Next: Reflect");
-  nextBtn.disabled = countSelectedStrategies() === 0;
+  nextBtn.disabled = noneSelected;
   nextBtn.onclick = () => {
     if(countSelectedStrategies() === 0) return;
     state.step = 3;
@@ -733,8 +762,11 @@ function countSelectedStrategies(){
   return Object.keys(state.selectedStrategies).filter(k=>state.selectedStrategies[k]).length;
 }
 function updateNextButtonStep2(){
-  const btn = document.getElementById("step2-next");
-  if(btn) btn.disabled = countSelectedStrategies() === 0;
+  const noneSelected = countSelectedStrategies() === 0;
+  ["step2-next", "step2-download", "step2-print"].forEach(id=>{
+    const btn = document.getElementById(id);
+    if(btn) btn.disabled = noneSelected;
+  });
 }
 
 function renderStep3(app){
@@ -792,6 +824,63 @@ function renderStep3(app){
   }
   nav.appendChild(rightGroup);
   app.appendChild(nav);
+}
+
+function collectSelectedStrategies(){
+  const groups = [];
+  state.selectedConditions.forEach(condKey=>{
+    const cond = CONDITIONS[condKey];
+    const items = cond.strategies
+      .map((s, idx)=>({s, idx}))
+      .filter(({idx})=> state.selectedStrategies[strategyKey(condKey, idx)])
+      .map(({s})=>s);
+    if(items.length) groups.push({label: cond.label, items});
+  });
+  return groups;
+}
+
+function downloadSelectedStrategies(){
+  const groups = collectSelectedStrategies();
+  if(groups.length === 0) return;
+
+  let out = "SEND Strategies Toolkit - Selected Strategies\n";
+  out += "Generated: " + new Date().toLocaleString() + "\n";
+  out += "For use in lesson planning or an ILP\n";
+  out += "========================================\n\n";
+
+  groups.forEach(g=>{
+    out += g.label.toUpperCase() + "\n" + "-".repeat(g.label.length) + "\n\n";
+    g.items.forEach(s=>{ out += "- " + s + "\n\n"; });
+  });
+
+  const blob = new Blob([out], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "send-strategies-selected.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function printSelectedStrategies(){
+  const groups = collectSelectedStrategies();
+  if(groups.length === 0) return;
+
+  const area = document.getElementById("print-area");
+  area.innerHTML = "";
+  area.appendChild(text("h1", {}, "SEND Strategies - Selected Strategies"));
+  area.appendChild(text("p", {class:"print-meta"}, "Generated " + new Date().toLocaleDateString() + " - for use in lesson planning or an ILP"));
+
+  groups.forEach(g=>{
+    area.appendChild(text("h2", {}, g.label));
+    const ul = el("ul", {});
+    g.items.forEach(s=>{ ul.appendChild(text("li", {}, s)); });
+    area.appendChild(ul);
+  });
+
+  window.print();
 }
 
 function downloadReflections(){
