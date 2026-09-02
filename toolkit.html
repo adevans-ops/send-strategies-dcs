@@ -208,7 +208,7 @@
     margin-top:22px;
     gap:12px;
   }
-  .nav-row .right-group{ display:flex; gap:10px; }
+  .nav-row .right-group{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
   button.btn{
     font-size:0.95rem;
     font-weight:600;
@@ -252,10 +252,27 @@
     .nav-row{ flex-direction:column-reverse; align-items:stretch; }
     .nav-row .right-group{ justify-content:flex-end; }
   }
+
+  #print-area{ display:none; }
+  @media print{
+    .wrap{ display:none !important; }
+    #print-area{
+      display:block;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:#000;
+      padding:20px;
+    }
+    #print-area h1{ font-size:1.3rem; margin-bottom:4px; }
+    #print-area .print-meta{ color:#444; font-size:0.85rem; margin-top:0; margin-bottom:20px; }
+    #print-area h2{ font-size:1.05rem; margin:22px 0 8px; page-break-after:avoid; }
+    #print-area ul{ margin:0 0 4px; padding-left:20px; }
+    #print-area li{ margin-bottom:10px; page-break-inside:avoid; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
+<div id="print-area"></div>
 
 <script>
 /* ---------- Data extracted from "SEND Strategies" (Beating Bureaucracy in Special Educational Needs, Jean Gross, Routledge, 2023) ---------- */
@@ -264,7 +281,7 @@ const CONDITIONS = {
     label: "Attention Deficit Hyperactivity Disorder (ADHD)",
     color: "#c0533e",
     strategies: [
-      `Take child to unfamiliar classroom before lesson so that they can familiarise themselves with it and discuss where they should sit.`,
+      `Take pupil to unfamiliar classroom before lesson so that they can familiarise themselves with it and discuss where they should sit.`,
       `Discuss seating pupil near front with their back to the class, between two good role models and well away from areas other pupils need to walk through.`,
       `Establish a quiet place where pupil can go to work.`,
       `Keep one wall plain if you have lots of displays so the pupil can sit facing that to avoid overstimulation.`,
@@ -288,7 +305,7 @@ const CONDITIONS = {
     label: "Autism",
     color: "#6a4c93",
     strategies: [
-      `Take child to unfamiliar classroom before lesson so that they can familiarise themselves with it and discuss lighting, position of teacher, where they should sit, for example, near the door or away from busy displays and distractions.`,
+      `Take pupil to unfamiliar classroom before lesson so that they can familiarise themselves with it and discuss lighting, position of teacher, where they should sit, for example, near the door or away from busy displays and distractions.`,
       `Keep one wall plain if you have lots of displays so the pupil can sit facing that to avoid sensory overload.`,
       `Allow pupil to use ear defenders and a ‘noisemeter’ on the wall to show classmates when noise levels get too high.`,
       `Set up an individual workstation with propped box files as screeners.`,
@@ -302,9 +319,9 @@ const CONDITIONS = {
       `Teach/use clear classroom routines, for example, have all pupils hold an object when it is their turn to talk. Display classroom rules and routines, illustrated by pictures, for pupil to refer to. Illustrate them visually – for example, use a traffic-light system to indicate whether pupils can talk or not, or symbols for different noise levels (partner voices, group voices, classroom voice, playground voices).`,
       `Use a visual way of showing the pupil what they/the class will be doing, such as a sequenced series of pictures (a visual timetable), clockface divided into sections or written list.`,
       `Use timeline of events – arrows that branch to show where pupil will have to make choices.`,
-      `Where visual timetables with cards are used, choose autistic children to be the ones to put up the cards on the timetable.`,
+      `Where visual timetables with cards are used, choose autistic pupils to be the ones to put up the cards on the timetable.`,
       `Where visual timetables are used, include an ‘oops’ card to add any unexpected changes to the regular routine.`,
-      `Put the next day’s visual timetable up before children leave at the end of the day.`,
+      `Put the next day’s visual timetable up before pupils leave at the end of the day.`,
       `Use pictures or symbols to show pupils what they will be doing ‘Now’ and ‘Next’. Use ‘if’ and ‘then’ pictures/symbols to show what the pupil will be able to do if they first complete a certain task.`,
       `Use pictures to flag up a change in activity in advance, such as a round table to show pupils are going to move into groups.`,
       `If the pupil has sensory issues, provide gloves or other means of handling tactile materials (tongs, etc.).`,
@@ -341,7 +358,7 @@ const CONDITIONS = {
       `Model talking about how you are feeling, reflect back how you think the pupil might be feeling, help pupil connect their actions to the underlying feelings. Reiterate that all feelings are OK – it’s what we do with them (behaviour) that might not be.`,
       `Support pupil to use planned strategies to regulate their emotions, for example, personal calm-down box, deep breathing.`,
       `Make tasks short, with frequent breaks and opportunities to move around.`,
-      `Remember that children (and adults) who are stressed find it hard to take in and remember complex information; make instructions short and clear. When pupil is experiencing emotional turbulence or anxiety, provide low-key tasks and increased structure and predictability in the classroom environment.`,
+      `Remember that pupils (and adults) who are stressed find it hard to take in and remember complex information; make instructions short and clear. When pupil is experiencing emotional turbulence or anxiety, provide low-key tasks and increased structure and predictability in the classroom environment.`,
       `Set tasks with clear goals, outputs and timescales.`,
       `Make explicit the relevance of any task to the pupil’s goals.`,
       `Teach/use clear classroom routines, for example, have all pupils hold an object when it is their turn to talk. Display classroom rules and routines for pupil to refer to. Illustrate them visually – for example, use a traffic-light system to indicate whether pupils can talk or not, or symbols for different noise levels (partner voices, group voices, classroom voice, playground voices).`,
@@ -420,7 +437,7 @@ const CONDITIONS = {
     color: "#a13d63",
     strategies: [
       `Use TA for pre-tutoring – preparing pupil for lesson, for example, explaining new words and concepts.`,
-      `Take child to unfamiliar classroom before lesson so that they can discuss lighting, position of teacher, where they sit.`,
+      `Take pupil to unfamiliar classroom before lesson so that they can discuss lighting, position of teacher, where they sit.`,
       `Seat pupil at front where able to read text, hear and lip-read.`,
       `Position sign supporters alongside teacher where pupil can see both.`,
       `Ensure light is on teacher’s face, that is, light source behind pupil – don’t stand with your back to a window.`,
@@ -454,7 +471,7 @@ const CONDITIONS = {
       `Link new learning to what pupil already knows – for example, start lesson with class mind map of what they already know about a subject.`,
       `Tell pupils the three key points of the lesson, teach them and recap on them at the end.`,
       `Break new learning down into small steps.`,
-      `Provide multiple examples of new concepts, and take these examples from children’s own real-life experience rather than talking in the abstract.`,
+      `Provide multiple examples of new concepts, and take these examples from pupils’ own real-life experience rather than talking in the abstract.`,
       `Use visual and kinaesthetic learning – learning from pictures, diagrams, mind maps, using practical equipment, handling objects, moving and doing rather than sitting.`,
       `Use scaffolding – having a peer or adult work alongside the pupil at first, then gradually withdraw as confidence grows, or having pupil finish a task that has already been part-done for them.`,
       `Use short, simple instructions. Give one at a time and check for understanding. Write down and leave up instructions after saying them.`,
@@ -483,7 +500,7 @@ const CONDITIONS = {
     strategies: [
       `Use TA for pre-tutoring – preparing pupil for a task so that they come to it already knowing the key vocabulary and concepts.`,
       `Begin work on a new topic with pupils’ existing knowledge and experiences – make a mind map or other visual representation of what they already know.`,
-      `When you start a new topic, develop a class chart of the vocabulary that pupils will find useful or need to learn. Teach each word by helping children build a web of associations – what it sounds like, what it means, how it fits in a sentence.`,
+      `When you start a new topic, develop a class chart of the vocabulary that pupils will find useful or need to learn. Teach each word by helping pupils build a web of associations – what it sounds like, what it means, how it fits in a sentence.`,
       `Use cued listening – give pupil a small number of questions that they will have to answer after listening to teacher explanation or video input.`,
       `Use pupil’s name before asking a question or giving an instruction.`,
       `Give directions before an activity, not during it.`,
@@ -505,7 +522,7 @@ const CONDITIONS = {
       `Accept pupil’s spoken utterances, but rephrase and give them back in a grammatically correct and expanded version.`,
       `Support oral work with talk frames/key phrases (‘First . . . next . . . finally’, ‘I think . . . but on the other hand’).`,
       `Provide topic-related role-play/drama opportunities and model the language to be used.`,
-      `Talk about what you are doing using statements which give children examples of the language they might use.`,
+      `Talk about what you are doing using statements which give pupils examples of the language they might use.`,
       `Support writing with writing frames and lists of vocabulary to choose from.`,
       `Use a range of ways of recording so that learning is not limited by the pupil’s ability to write full English sentences: bullet points and mind maps; ordering tasks – for example, ordering cut-out words to make a sentence, or sentences to make a sequence of instructions; matching tasks, such as matching labels to pictures/diagrams/maps; cloze procedure, where they fill in missing words in text; annotating a printout of IWB page; PowerPoint presentations; making posters, oral presentations, videos, dramatic reconstructions.`,
       `Provide the pupil with a study pack – glossaries of key subject vocabulary, highlighter pens, glue stick, post-it notes, index cards for subject vocabulary or spelling, mind maps/cartoon strips/key word lists, templates for writing up science experiments, etc.`,
@@ -519,7 +536,7 @@ const CONDITIONS = {
     strategies: [
       `Use TA for pre-tutoring – preparing pupil for lesson, for example, explaining concepts that rely on vision for understanding.`,
       `Don’t ask pupil if they can see what is on board/IWB, etc. (they may not know) – check by using symbols that pupil knows, then use same-size font/background/colour as the symbols you have checked.`,
-      `Take child to unfamiliar classroom before lesson so that they can discuss lighting, where they sit.`,
+      `Take pupil to unfamiliar classroom before lesson so that they can discuss lighting, where they sit.`,
       `Avoid pupil having to look directly into a light source – do not sit or stand with the light behind you.`,
       `Use clear, well-spaced print that is suitably contrasted with the background according to individual pupil’s needs (for x, y colour on z background). Use non-glossy, non-reflective paper. Use photocopies of masters, not of faint blurred versions.`,
       `Give verbal information to replace/supplement information from pictures, questions, facial expressions.`,
@@ -584,7 +601,7 @@ function render(){
   const header = el("header", {class:"top"}, [
     el("div", {}, [
       text("h1", {}, "SEND Strategies Toolkit"),
-      text("p", {}, "Choose conditions, pick strategies to try, then reflect on how they went.")
+      text("p", {}, "Choose conditions, pick strategies to try, then optionally reflect on how they went.")
     ]),
     (function(){
       const b = text("button", {class:"reset-link", type:"button"}, "Start over");
@@ -601,7 +618,7 @@ function render(){
   app.appendChild(header);
 
   const steps = el("div", {class:"steps"}, [1,2,3].map(n=>{
-    const labels = {1:"1. Conditions", 2:"2. Strategies", 3:"3. Reflect"};
+    const labels = {1:"1. Conditions", 2:"2. Strategies", 3:"3. Reflect (optional)"};
     const cls = n === state.step ? "step-pill active" : (n < state.step ? "step-pill done" : "step-pill");
     return text("div", {class:cls}, labels[n]);
   }));
@@ -716,8 +733,20 @@ function renderStep2(app){
   nav.appendChild(backBtn);
 
   const rightGroup = el("div", {class:"right-group", id:"step2-right"});
-  const nextBtn = text("button", {class:"btn primary", type:"button", id:"step2-next"}, "Next: Reflect");
-  nextBtn.disabled = countSelectedStrategies() === 0;
+  const noneSelected = countSelectedStrategies() === 0;
+
+  const downloadBtn = text("button", {class:"btn secondary", type:"button", id:"step2-download"}, "Download strategies (.txt)");
+  downloadBtn.disabled = noneSelected;
+  downloadBtn.onclick = downloadSelectedStrategies;
+  rightGroup.appendChild(downloadBtn);
+
+  const printBtn = text("button", {class:"btn secondary", type:"button", id:"step2-print"}, "Print / Save as PDF");
+  printBtn.disabled = noneSelected;
+  printBtn.onclick = printSelectedStrategies;
+  rightGroup.appendChild(printBtn);
+
+  const nextBtn = text("button", {class:"btn primary", type:"button", id:"step2-next"}, "Next: Reflect (optional)");
+  nextBtn.disabled = noneSelected;
   nextBtn.onclick = () => {
     if(countSelectedStrategies() === 0) return;
     state.step = 3;
@@ -733,8 +762,11 @@ function countSelectedStrategies(){
   return Object.keys(state.selectedStrategies).filter(k=>state.selectedStrategies[k]).length;
 }
 function updateNextButtonStep2(){
-  const btn = document.getElementById("step2-next");
-  if(btn) btn.disabled = countSelectedStrategies() === 0;
+  const noneSelected = countSelectedStrategies() === 0;
+  ["step2-next", "step2-download", "step2-print"].forEach(id=>{
+    const btn = document.getElementById(id);
+    if(btn) btn.disabled = noneSelected;
+  });
 }
 
 function renderStep3(app){
@@ -746,8 +778,8 @@ function renderStep3(app){
     app.appendChild(card);
   } else {
     const card = el("div", {class:"card"});
-    card.appendChild(text("h2", {}, "Reflect on each strategy"));
-    card.appendChild(text("p", {class:"hint"}, "Add your thoughts on how each strategy went with your students. Your notes are saved automatically on this device."));
+    card.appendChild(text("h2", {}, "Reflect on each strategy (optional)"));
+    card.appendChild(text("p", {class:"hint"}, "This step is entirely optional. Add a note on how a strategy went with your pupils if it's useful, for example as evidence for inspection, but feel free to leave any box blank and download your list anyway. Notes are saved automatically on this device."));
 
     state.selectedConditions.forEach(condKey=>{
       const cond = CONDITIONS[condKey];
@@ -765,7 +797,7 @@ function renderStep3(app){
         const stratP = text("div", {class:"strategy-text"}, strategyText);
         block.appendChild(stratP);
 
-        const ta = el("textarea", {placeholder:"What did you try, and how did it go for your students?"});
+        const ta = el("textarea", {placeholder:"What did you try, and how did it go for your pupils?"});
         ta.value = state.reflections[key] || "";
         ta.oninput = () => {
           state.reflections[key] = ta.value;
@@ -792,6 +824,63 @@ function renderStep3(app){
   }
   nav.appendChild(rightGroup);
   app.appendChild(nav);
+}
+
+function collectSelectedStrategies(){
+  const groups = [];
+  state.selectedConditions.forEach(condKey=>{
+    const cond = CONDITIONS[condKey];
+    const items = cond.strategies
+      .map((s, idx)=>({s, idx}))
+      .filter(({idx})=> state.selectedStrategies[strategyKey(condKey, idx)])
+      .map(({s})=>s);
+    if(items.length) groups.push({label: cond.label, items});
+  });
+  return groups;
+}
+
+function downloadSelectedStrategies(){
+  const groups = collectSelectedStrategies();
+  if(groups.length === 0) return;
+
+  let out = "SEND Strategies Toolkit - Selected Strategies\n";
+  out += "Generated: " + new Date().toLocaleString() + "\n";
+  out += "For use in lesson planning or an ILP\n";
+  out += "========================================\n\n";
+
+  groups.forEach(g=>{
+    out += g.label.toUpperCase() + "\n" + "-".repeat(g.label.length) + "\n\n";
+    g.items.forEach(s=>{ out += "- " + s + "\n\n"; });
+  });
+
+  const blob = new Blob([out], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "send-strategies-selected.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function printSelectedStrategies(){
+  const groups = collectSelectedStrategies();
+  if(groups.length === 0) return;
+
+  const area = document.getElementById("print-area");
+  area.innerHTML = "";
+  area.appendChild(text("h1", {}, "SEND Strategies - Selected Strategies"));
+  area.appendChild(text("p", {class:"print-meta"}, "Generated " + new Date().toLocaleDateString() + " - for use in lesson planning or an ILP"));
+
+  groups.forEach(g=>{
+    area.appendChild(text("h2", {}, g.label));
+    const ul = el("ul", {});
+    g.items.forEach(s=>{ ul.appendChild(text("li", {}, s)); });
+    area.appendChild(ul);
+  });
+
+  window.print();
 }
 
 function downloadReflections(){
