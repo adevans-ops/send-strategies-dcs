@@ -601,7 +601,7 @@ function render(){
   const header = el("header", {class:"top"}, [
     el("div", {}, [
       text("h1", {}, "SEND Strategies Toolkit"),
-      text("p", {}, "Choose conditions, pick strategies to try, then reflect on how they went.")
+      text("p", {}, "Choose conditions, pick strategies to try, then optionally reflect on how they went.")
     ]),
     (function(){
       const b = text("button", {class:"reset-link", type:"button"}, "Start over");
@@ -618,7 +618,7 @@ function render(){
   app.appendChild(header);
 
   const steps = el("div", {class:"steps"}, [1,2,3].map(n=>{
-    const labels = {1:"1. Conditions", 2:"2. Strategies", 3:"3. Reflect"};
+    const labels = {1:"1. Conditions", 2:"2. Strategies", 3:"3. Reflect (optional)"};
     const cls = n === state.step ? "step-pill active" : (n < state.step ? "step-pill done" : "step-pill");
     return text("div", {class:cls}, labels[n]);
   }));
@@ -745,7 +745,7 @@ function renderStep2(app){
   printBtn.onclick = printSelectedStrategies;
   rightGroup.appendChild(printBtn);
 
-  const nextBtn = text("button", {class:"btn primary", type:"button", id:"step2-next"}, "Next: Reflect");
+  const nextBtn = text("button", {class:"btn primary", type:"button", id:"step2-next"}, "Next: Reflect (optional)");
   nextBtn.disabled = noneSelected;
   nextBtn.onclick = () => {
     if(countSelectedStrategies() === 0) return;
@@ -778,8 +778,8 @@ function renderStep3(app){
     app.appendChild(card);
   } else {
     const card = el("div", {class:"card"});
-    card.appendChild(text("h2", {}, "Reflect on each strategy"));
-    card.appendChild(text("p", {class:"hint"}, "Add your thoughts on how each strategy went with your pupils. Your notes are saved automatically on this device."));
+    card.appendChild(text("h2", {}, "Reflect on each strategy (optional)"));
+    card.appendChild(text("p", {class:"hint"}, "This step is entirely optional. Add a note on how a strategy went with your pupils if it's useful, for example as evidence for inspection, but feel free to leave any box blank and download your list anyway. Notes are saved automatically on this device."));
 
     state.selectedConditions.forEach(condKey=>{
       const cond = CONDITIONS[condKey];
